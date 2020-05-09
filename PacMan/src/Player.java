@@ -29,9 +29,9 @@ class ListBots {
 		System.err.println("Id de recherche: " + id);
 		for (int i = 0; i < listBots.size(); i++) {
 			b = (Bot) listBots.get(i);
-			System.err.println("Id du bot liste: " + b.getId());
+			// System.err.println("Id du bot liste: " + b.getId());
 			if (b.getId() == id) {
-				System.err.println("Trouvé");
+				// System.err.println("Trouvé");
 				return b;
 			}
 		}
@@ -110,6 +110,7 @@ class Bot {
 	Boolean dix;
 	Boolean speed;
 	Boolean collision;
+	Boolean vivant;
 	int speedTurnsLeft;
 	int abilityCooldown;
 
@@ -117,10 +118,19 @@ class Bot {
 		this.dix = false;
 		this.speed = false;
 		this.collision = false;
+		this.vivant = true;
 	}
 
 	public int getX() {
 		return xb;
+	}
+
+	public Boolean getVivant() {
+		return vivant;
+	}
+
+	public void setVivant(Boolean vivant) {
+		this.vivant = vivant;
 	}
 
 	public Boolean getDix() {
@@ -218,10 +228,12 @@ class Player {
 			// System.err.println("Test de collision");
 			if (bot.getX() == bot.getXm() && bot.getY() == bot.getYm()) {
 				bot.setCollision(true);
+			} else {
+				bot.setCollision(false);
 			}
 		}
-		// System.err.println("Ancien X: " + bot.getXm() + " nouveau: " + bot.getX());
-		// System.err.println("Ancien Y: " + bot.getYm() + " nouveau: " + bot.getY());
+		System.err.println("Ancien X: " + bot.getXm() + " nouveau: " + bot.getX());
+		System.err.println("Ancien Y: " + bot.getYm() + " nouveau: " + bot.getY());
 		bot.setXm(bot.getX());
 		bot.setYm(bot.getY());
 		// System.err.println("Bot: " + bot.getId() + " collision: " +
@@ -237,34 +249,37 @@ class Player {
 		ArrayList<Bot> listeBots = bots.getListBots();
 		ArrayList<Pullet> listePullets = pullets.getListPullet();
 		for (Bot b : listeBots) {
-			System.err.println("Bot n°" + b.getId());
-			b.setSpeed(false);
-			b.setDix(false);
+			if (b.getVivant()) {
+				System.err.println("Bot n°" + b.getId());
+				b.setSpeed(false);
+				b.setDix(false);
 
-			Player.collision(b);
-			System.err.println("Collision: " + b.getCollision());
+				Player.collision(b);
+				System.err.println("Collision: " + b.getCollision());
 
-			if (b.getCollision() == false) {
-				move += Player.speedBot(b);
+				if (b.getCollision() == false) {
+					move += Player.speedBot(b);
 
-				int sum = 0;
-				for (Pullet nbrTen : listePullets) {
-					if (nbrTen.getValue() == 10) {
-						sum++;
+					int sum = 0;
+					for (Pullet nbrTen : listePullets) {
+						if (nbrTen.getValue() == 10) {
+							sum++;
+						}
 					}
-				}
-				if (sum != 0 && b.getSpeed() == false) {
+					if (sum != 0 && b.getSpeed() == false) {
 
-					move += Player.distanceTen(pullets, b);
-					b.setDix(true);
+						move += Player.distanceTen(pullets, b);
+						b.setDix(true);
+					}
+					if (b.getDix() == false && b.getSpeed() == false) {
+						move += Player.distance(pullets, b);
+					}
+					// System.err.println("Vers un speed :" + b.getSpeed());
+					// System.err.println("Vers un dix :" + b.getDix());
+				} else {
+					move += Player.distanceLoin(pullets, b);
 				}
-				if (b.getDix() == false && b.getSpeed() == false) {
-					move += Player.distance(pullets, b);
-				}
-				// System.err.println("Vers un speed :" + b.getSpeed());
-				// System.err.println("Vers un dix :" + b.getDix());
-			} else {
-				move += Player.distanceLoin(pullets, b);
+				b.setVivant(false);
 			}
 		}
 		return move;
@@ -411,19 +426,20 @@ class Player {
 						bot.setId(pacId);
 						bot.setAbilityCooldown(abilityCooldown);
 						listBot.add(bot);
-						System.err.println("bot new: " + bot.getId());
+						// System.err.println("bot new: " + bot.getId());
+						listBots.setListBots(listBot);
 					} else {
 						bot = ListBots.searchBot(pacId);
 						bot.setX(x);
 						bot.setY(y);
-						System.err.println("bot deja: " + bot.getId());
-                
+						bot.setVivant(true);
+						// System.err.println("bot deja: " + bot.getId());
+
 					}
 					// System.err.println("Ancien X: " + bot.getXm() + " nouveau: " + bot.getX());
 					// System.err.println("Ancien Y: " + bot.getYm() + " nouveau: " + bot.getY());
 				}
 			}
-			listBots.setListBots(listBot);
 
 			int visiblePelletCount = in.nextInt(); // all pellets in sight
 			ArrayList<Pullet> listPullet = new ArrayList<Pullet>();
@@ -443,16 +459,15 @@ class Player {
 			// Sysout du nombre de tours
 			turn++;
 			System.err.println("Tours = " + turn);
-			//System.err.println("Tours - 1 = " + turnMoins);
-            for (Bot list: listBot) {
-                System.err.println("Bot de la liste: " + list.getId());
-            }
+			// System.err.println("Tours - 1 = " + turnMoins);
+			for (Bot list : listBot) {
+				System.err.println("Bot de la liste: " + list.getId());
+			}
 			if (turnMoins != turn) {
 				turnMoins = turn;
 				// Action à faire
-                System.err.println("action");
-                
-                
+				System.err.println("action");
+
 				String move = player.pulletTen(listPullets, listBots);
 				player.move(move);
 			}
