@@ -109,6 +109,7 @@ class Bot {
 	int idb;
 	Boolean dix;
 	Boolean speed;
+	Boolean speedCurrent;
 	Boolean collision;
 	Boolean vivant;
 	int speedTurnsLeft;
@@ -118,11 +119,20 @@ class Bot {
 		this.dix = false;
 		this.speed = false;
 		this.collision = false;
+		this.speedCurrent = false;
 		this.vivant = true;
 	}
 
 	public int getX() {
 		return xb;
+	}
+
+	public Boolean getSpeedCurrent() {
+		return speedCurrent;
+	}
+
+	public void setSpeedCurrent(Boolean speedCurrent) {
+		this.speedCurrent = speedCurrent;
 	}
 
 	public Boolean getVivant() {
@@ -253,8 +263,10 @@ class Player {
 				System.err.println("Bot n°" + b.getId());
 				b.setSpeed(false);
 				b.setDix(false);
+				if (b.getSpeedTurnsLeft() == 0) {
+					Player.collision(b);
+				}
 
-				Player.collision(b);
 				System.err.println("Collision: " + b.getCollision());
 
 				if (b.getCollision() == false) {
