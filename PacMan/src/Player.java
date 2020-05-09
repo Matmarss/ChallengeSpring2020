@@ -417,7 +417,7 @@ class Player {
 						bot.setX(x);
 						bot.setY(y);
 						System.err.println("bot deja: " + bot.getId());
-                        list
+                
 					}
 					// System.err.println("Ancien X: " + bot.getXm() + " nouveau: " + bot.getX());
 					// System.err.println("Ancien Y: " + bot.getYm() + " nouveau: " + bot.getY());
